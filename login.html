@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Rent - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .form-password-container {
+    position: relative;
+}
+
+.form-eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 40%;
+    transform: translateY(-50%);
+    width: 20px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.pass-field {
+    padding-right: 40px;
+}
+
+
+    </style>
+</head>
+<body>
+
+<div class="form-wrapper">
+
+    <div class="form-logo-box">
+        <img src="images/smallcarlogo.png" class="form-logo-img">
+        <h1 class="form-logo-text">GO <span>RENT</span>.</h1>
+    </div>
+
+    <form method="POST" class="form" action="login.php">
+
+        <label class="form-label">Username</label>
+        <input type="text" class="form-input" name="username">
+
+        <label class="form-label">Password</label>
+        <div class="form-password-container">
+            <input 
+                type="password" 
+                class="form-input pass-field"
+                name="password"
+                id="passwordField"
+            >
+
+            <img 
+                src="images/eyeclose.png"
+                class="form-eye-icon"
+                id="togglePassword"
+                alt="Toggle password"
+    >
+        </div>
+
+
+        <div class="form-options">
+            <a href="forgot_password.php" class="form-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="form-btn">Login</button>
+    </form>
+
+    <p class="form-create-text">
+        Don't have an account?
+        <a href="signup.html" class="form-link">Create One</a>
+    </p>
+
+</div>
+
+<!-- JavaScript -->
+<script>
+    const togglePassword = document.getElementById("togglePassword");
+    const passwordField = document.getElementById("passwordField");
+
+    let isVisible = false;
+
+    togglePassword.addEventListener("click", () => {
+        if (isVisible) {
+            passwordField.type = "password";
+            togglePassword.src = "images/eyeclose.png";
+        } else {
+            passwordField.type = "text";
+            togglePassword.src = "images/eyeopen.png";
+        }
+        isVisible = !isVisible;
+    });
+</script>
+
+
+</body>
+</html>

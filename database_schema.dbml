@@ -1,0 +1,165 @@
+// Vehicle Booking System - Database Schema (DBML)
+// Use this code on https://dbdiagram.io to visualize the database schema
+// Docs: https://dbml.dbdiagram.io/docs
+
+// ============================================
+// USERS TABLE
+// ============================================
+Table users {
+  id integer [primary key, increment]
+  fullname varchar(255) [not null]
+  username varchar(100) [unique, not null]
+  email varchar(255) [unique, not null]
+  password varchar(255) [not null, note: 'Hashed password']
+  status varchar(20) [default: 'active', note: 'active or blocked']
+  profile_image varchar(255) [null]
+  otp varchar(6) [null, note: 'One-time password for verification']
+  otp_expiry timestamp [null]
+  created_at timestamp [default: 'CURRENT_TIMESTAMP']
+  updated_at timestamp [default: 'CURRENT_TIMESTAMP']
+  
+  indexes {
+    username
+    email
+    status
+    created_at
+  }
+}
+
+// ============================================
+// VEHICLES TABLE
+// ============================================
+Table vehicles {
+  id integer [primary key, increment]
+  name varchar(255) [not null]
+  category varchar(100) [not null, note: 'SUV, Sedan, Hatchback, etc.']
+  price integer [not null, note: 'Daily rental price in Rs.']
+  fuel_type varchar(50) [not null, note: 'petrol, diesel, electric, hybrid']
+  transmission varchar(50) [not null, note: 'manual or automatic']
+  seating_capacity integer [not null]
+  status varchar(20) [default: 'available', note: 'available or unavailable']
+  image varchar(255) [null]
+  avg_rating decimal(3,2) [default: 0.00, note: 'Denormalized from reviews']
+  total_reviews integer [default: 0, note: 'Denormalized count']
+  created_at timestamp [default: 'CURRENT_TIMESTAMP']
+  updated_at timestamp [default: 'CURRENT_TIMESTAMP']
+  
+  indexes {
+    status
+    category
+    price
+    avg_rating
+    created_at
+  }
+}
+
+// ============================================
+// BOOKINGS TABLE
+// ============================================
+Table bookings {
+  id integer [primary key, increment]
+  user_id integer [not null]
+  vehicle_id integer [not null]
+  vehicle_name varchar(255) [not null, note: 'Snapshot at booking time']
+  pickup varchar(255) [not null]
+  drop_location varchar(255) [not null]
+  pickup_date date [not null]
+  return_date date [not null]
+  price integer [not null, note: 'Total price in Rs.']
+  payment_status varchar(20) [default: 'Unpaid', note: 'Paid, Unpaid, or Expired']
+  booking_status varchar(20) [default: 'Active', note: 'Active, Booked, Confirmed, Completed, Cancelled, Expired']
+  cancel_reason varchar(255) [null]
+  cancelled_at timestamp [null]
+  created_at timestamp [default: 'CURRENT_TIMESTAMP']
+  updated_at timestamp [default: 'CURRENT_TIMESTAMP']
+  
+  indexes {
+    user_id
+    vehicle_id
+    payment_status
+    booking_status
+    pickup_date
+    return_date
+    created_at
+  }
+}
+
+// ============================================
+// REVIEWS TABLE
+// ============================================
+Table reviews {
+  id integer [primary key, increment]
+  booking_id integer [unique, not null, note: 'One review per booking']
+  user_id integer [not null]
+  vehicle_id integer [not null]
+  rating integer [not null, note: 'Rating from 1 to 5']
+  comment text [null]
+  created_at timestamp [default: 'CURRENT_TIMESTAMP']
+  
+  indexes {
+    vehicle_id
+    user_id
+    rating
+    created_at
+  }
+}
+
+// ============================================
+// CANCELLATION_FEEDBACK TABLE
+// ============================================
+Table cancellation_feedback {
+  id integer [primary key, increment]
+  booking_id integer [unique, not null, note: 'One feedback per booking']
+  user_id integer [not null]
+  reason varchar(255) [null]
+  additional_comment text [null]
+  created_at timestamp [default: 'CURRENT_TIMESTAMP']
+  updated_at timestamp [default: 'CURRENT_TIMESTAMP']
+  
+  indexes {
+    user_id
+    reason
+    created_at
+  }
+}
+
+// ============================================
+// ADMINS TABLE
+// ============================================
+Table admins {
+  id integer [primary key, increment]
+  username varchar(100) [unique, not null]
+  password varchar(255) [not null, note: 'Hashed password']
+  created_at timestamp [default: 'CURRENT_TIMESTAMP']
+  updated_at timestamp [default: 'CURRENT_TIMESTAMP']
+  
+  indexes {
+    username
+    created_at
+  }
+}
+
+// ============================================
+// RELATIONSHIPS
+// ============================================
+
+// User to Bookings (1:N)
+Ref user_bookings: bookings.user_id > users.id [delete: cascade]
+
+// Vehicle to Bookings (1:N)
+Ref vehicle_bookings: bookings.vehicle_id > vehicles.id [delete: cascade]
+
+// Booking to Reviews (1:1)
+Ref booking_review: reviews.booking_id > bookings.id [delete: cascade]
+
+// User to Reviews (1:N)
+Ref user_reviews: reviews.user_id > users.id [delete: cascade]
+
+// Vehicle to Reviews (1:N)
+Ref vehicle_reviews: reviews.vehicle_id > vehicles.id [delete: cascade]
+
+// User to Cancellation Feedback (1:N)
+Ref user_feedback: cancellation_feedback.user_id > users.id [delete: cascade]
+
+// Booking to Cancellation Feedback (1:1)
+Ref booking_feedback: cancellation_feedback.booking_id > bookings.id [delete: cascade]
